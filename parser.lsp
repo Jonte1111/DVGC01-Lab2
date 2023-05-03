@@ -299,10 +299,10 @@
 ;; *** TO BE DONE ***
 (defun var-type(state)
   (cond
-	(eq(token state) 'INTEGER (match state 'INTEGER))
-	(eq(token state) 'REAL (match state 'REAL))
-	(eq(token state) 'BOOLEAN (match state 'BOOLEAN))
-	;;(t (synerr2 state))
+	((eq(token state) 'INTEGER) (match state 'INTEGER))
+	((eq(token state) 'REAL) (match state 'REAL))
+	((eq(token state) 'BOOLEAN) (match state 'BOOLEAN))
+	(t (synerr2 state))
 	)
   )
 (defun id-list-aux(state)
@@ -311,9 +311,14 @@
 )
 (defun id-list(state)
 	(if(eq(token state) 'ID)
-		(match state 'ID)
+	 	(if(symtab-member state (lexeme state))
+			(symtab-add state (lexeme state))
+			(match state 'ID)
+		  ) 
+		(synerr1 state)
 	  )
-)
+	(if(eq(token state) 'COMMA)(id-list-aux state))
+) 
 
 (defun var-dec(state)
 	(id-list state)
@@ -334,7 +339,6 @@
 ; <program-header>
 ;;=====================================================================
 
-;; *** TO BE DONE ***
 (defun program-header(state)
 	(match state 'program)
 	(match state 'ID)
@@ -353,7 +357,7 @@
 (defun program (state)
    (program-header state)
    (var-part state)
-   ;;(stat-part      state)
+   (stat-part      state)
 )
 
 ;;=====================================================================
