@@ -288,12 +288,18 @@
 
 ;; *** TO BE DONE ***
 (defun operand(state)
-	(if(is_id (lexeme state)) 
-		(match state 'ID)
+	(cond
+		((and(eq(token state) 'ID) (symtab-member state (lexeme state)))
+			(match state 'ID))
+		((eq(token state) 'ID)  
+			(progn 
+				(semerr2 state)
+				(match state 'ID)
+			  )
+		 )
+		((eq(token state) 'NUM) (match state 'NUM))
+		(t(synerr3 state))
 	)
-	(if(is_number (lexeme state))
-		(match state 'NUM))
-	
 )
 (defun factor(state)
 	(if(eq(token state) 'LP)
@@ -305,22 +311,33 @@
 )
 (defun term(state)
 	(factor state)
-	(if(eq(token state) 'MULT)(match state 'MULT))
-	(factor state)
+	(if(eq(token state) 'MULTI)
+	  (progn
+	  	(match state 'MULTI)
+		(term state)
 
-
+	    )
+	)
 )
 (defun expr(state)
 	(term state)
 	(if(eq(token state) 'PLUS)
+	  (progn
 		(match state 'PLUS)
+		(expr state)
+	    )
 	)
-	(term state)
 )
 (defun assign-stat(state)
-	(match state 'ID)
-	(match state 'ASSIGN)
-	(expr state)
+	(if(eq(token state) 'ID)
+	      (progn 
+		 (if (not (symtab-member state (lexeme state)))
+		    (semerr2 state))
+		 (match state 'ID))
+	      (synerr1 state 'ID))
+	   
+	   (match state 'ASSIGN)
+	   (expr state)
 )
 (defun stat(state)
 	(assign-stat state)
@@ -364,10 +381,10 @@
 	(if(eq(token state) 'ID)
 	 	(if(not(symtab-member state (lexeme state)))
 			(symtab-add state (lexeme state))
-			(match state 'ID)
+			(synerr1 state)
 		  ) 
-		(synerr1 state)
 	  )
+			(match state 'ID)
 	(if(eq(token state) 'COMMA)(id-list-aux state))
 ) 
 
@@ -416,7 +433,6 @@
 ;;=====================================================================
 
 (defun check-end (state)
-;; *** TO BE DONE ***
 )
 
 ;;=====================================================================
