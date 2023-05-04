@@ -344,7 +344,7 @@
 )
 (defun stat-list-aux(state)
 	(match state 'SCOLON)
-	(stat-list(state))
+	(stat-list state)
 )
 (defun stat-list(state)
 	(stat state)
@@ -381,7 +381,7 @@
 	(if(eq(token state) 'ID)
 	 	(if(not(symtab-member state (lexeme state)))
 			(symtab-add state (lexeme state))
-			(synerr1 state)
+			(semerr1 state)
 		  ) 
 	  )
 			(match state 'ID)
@@ -431,8 +431,13 @@
 ;;=====================================================================
 ; THE PARSER - parse a file
 ;;=====================================================================
-
+(defun check-end-aux (state)
+	(semerr3 state)
+	(get-token state)
+	(check-end state)
+  )
 (defun check-end (state)
+  (if(not(eq(token state) 'EOF))(check-end-aux state))
 )
 
 ;;=====================================================================
@@ -463,9 +468,53 @@
 ;;=====================================================================
 
 (defun parse-all ()
+	(mapcar #'parse '("testfiles/testa.pas" 
+                     "testfiles/testb.pas" 
+                     "testfiles/testc.pas"
+                     "testfiles/testd.pas"
+                     "testfiles/teste.pas"
+                     "testfiles/testf.pas"
+                     "testfiles/testg.pas"
+                     "testfiles/testh.pas"
+                     "testfiles/testi.pas"
+                     "testfiles/testj.pas"
+                     "testfiles/testk.pas"
+                     "testfiles/testl.pas"
+                     "testfiles/testm.pas"
+                     "testfiles/testn.pas"
+                     "testfiles/testo.pas"
+                     "testfiles/testp.pas"
+                     "testfiles/testq.pas"
+                     "testfiles/testr.pas"
+                     "testfiles/tests.pas"
+                     "testfiles/testt.pas"
+                     "testfiles/testu.pas"
+                     "testfiles/testv.pas"
+                     "testfiles/testw.pas"
+                     "testfiles/testx.pas"
+                     "testfiles/testy.pas"
+                     "testfiles/testz.pas"
 
-;; *** TO BE DONE ***
-	(mapcar #'parse '("testfiles/testok1.pas"))
+                     "testfiles/testok1.pas"
+                     "testfiles/testok2.pas"
+                     "testfiles/testok3.pas"
+                     "testfiles/testok4.pas"
+                     "testfiles/testok5.pas"
+                     "testfiles/testok6.pas"
+                     "testfiles/testok7.pas"
+
+                     "testfiles/fun1.pas"
+                     "testfiles/fun2.pas"
+                     "testfiles/fun3.pas"
+                     "testfiles/fun4.pas"
+                     "testfiles/fun5.pas"
+
+                     "testfiles/sem1.pas"
+                     "testfiles/sem2.pas"
+                     "testfiles/sem3.pas"
+                     "testfiles/sem4.pas"
+                     "testfiles/sem5.pas"
+                     ))
 
 )
 
